@@ -2,7 +2,9 @@ package org.rmartinez.appmockito.ejemplos.services;
 
 import org.rmartinez.appmockito.ejemplos.models.Examen;
 
-public interface ExamenService {
-    Examen findExamenPorNombre(String nombre);
+import java.util.Optional;
 
+public interface ExamenService {
+    Optional<Examen> findExamenPorNombre(String nombre);
+    Examen findExamenPorNombreConPrguntas(String nombre);
 }
