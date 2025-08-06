@@ -13,4 +13,7 @@ public class Datos {
 
     public final static Examen EXAMEN = new Examen(null, "Física");
 
+    public final static List<Examen> EXAMENES_ID_NULL = Arrays.asList(new Examen(null, "Matematicas")
+            , new Examen(null,"Lengua")
+            , new Examen(null,"Ingles"));
 }
