@@ -16,4 +16,8 @@ public class Datos {
     public final static List<Examen> EXAMENES_ID_NULL = Arrays.asList(new Examen(null, "Matematicas")
             , new Examen(null,"Lengua")
             , new Examen(null,"Ingles"));
+
+    public final static List<Examen> EXAMENES_NEGATIVO = Arrays.asList(new Examen(-5L, "Matematicas")
+            , new Examen(-6L,"Lengua")
+            , new Examen(null,"Ingles"));
 }

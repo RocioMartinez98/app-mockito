@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -142,4 +143,41 @@ class ExamenServiceImplTest {
         verify(repository).findAll();
         verify(preguntaRepository).findPreguntasPorExamen(isNull());
     }
+
+    @Test
+    void testArgumentMatchers() {
+        when(repository.findAll()).thenReturn(Datos.EXAMENES);
+        when(preguntaRepository.findPreguntasPorExamen(anyLong())).thenReturn(Datos.PREGUNTAS);
+        service.findExamenPorNombreConPrguntas("Matematicas");
+
+        verify(repository).findAll();
+        //verify(preguntaRepository).findPreguntasPorExamen(eq(5L)); //Valida que sea 5L
+        //verify(preguntaRepository).findPreguntasPorExamen(argThat(arg -> arg != null && arg.equals(5L))); //Valida que sea 5L y != null
+        verify(preguntaRepository).findPreguntasPorExamen(argThat(arg -> arg != null && arg >= 5L));
+    }
+
+    public static class MiArgsMatchers implements ArgumentMatcher<Long>{
+        private Long argument;
+        @Override
+        public boolean matches(Long argument) {
+            this.argument= argument;
+            return argument != null && argument > 0;
+        }
+
+        @Override
+        public String toString() {
+            return "Es para un mensaje personalizado de error que imprime mochito en caso de que falle el test, debe ser un numero positivo";
+        }
+    }
+
+    @Test
+    void testArgumentMatchers2() {
+        when(repository.findAll()).thenReturn(Datos.EXAMENES_NEGATIVO);
+        when(preguntaRepository.findPreguntasPorExamen(anyLong())).thenReturn(Datos.PREGUNTAS);
+        service.findExamenPorNombreConPrguntas("Matematicas");
+
+        verify(repository).findAll();
+        verify(preguntaRepository).findPreguntasPorExamen(argThat(new MiArgsMatchers()));
+    }
+
 }
