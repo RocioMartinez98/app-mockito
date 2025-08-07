@@ -260,4 +260,61 @@ class ExamenServiceImplTest {
         verify(examenRepository).findAll();
         verify(preguntaRepository).findPreguntasPorExamen(anyLong());
     }
+
+    @Test
+    void testOrdenDeInvocaciones() {
+        when(repository.findAll()).thenReturn(Datos.EXAMENES);
+
+        service.findExamenPorNombreConPrguntas("Matematicas");
+        service.findExamenPorNombreConPrguntas("Lengua");
+
+        InOrder inOrder = inOrder(preguntaRepository);
+        inOrder.verify(preguntaRepository).findPreguntasPorExamen(5L);
+        inOrder.verify(preguntaRepository).findPreguntasPorExamen(6L);
+
+    }
+
+    @Test
+    void testOrdenDeInvocaciones2() {
+        when(repository.findAll()).thenReturn(Datos.EXAMENES);
+
+        service.findExamenPorNombreConPrguntas("Matematicas");
+        service.findExamenPorNombreConPrguntas("Lengua");
+
+        InOrder inOrder = inOrder(repository,preguntaRepository);
+        inOrder.verify(repository).findAll(); // Corresponde a matematicas
+        inOrder.verify(preguntaRepository).findPreguntasPorExamen(5L); // Corresponde a matematicas
+
+        inOrder.verify(repository).findAll(); // Corresponde a Lengua
+        inOrder.verify(preguntaRepository).findPreguntasPorExamen(6L); // Corresponde a Lengua
+
+    }
+
+    @Test
+    void testNumeroDeInvocaciones() {
+        when(repository.findAll()).thenReturn(Datos.EXAMENES);
+        service.findExamenPorNombreConPrguntas("Matematicas");
+
+        verify(preguntaRepository, times(1)).findPreguntasPorExamen(5L); //verifica que se ejecuta solo una vez
+        verify(preguntaRepository, atLeast(1)).findPreguntasPorExamen(5L);
+        verify(preguntaRepository, atLeastOnce()).findPreguntasPorExamen(5L); //verifica que se ejecuta al menos una vez
+        verify(preguntaRepository, atMost(10)).findPreguntasPorExamen(5L); //verifica que se ejecuta maximo X veces
+        verify(preguntaRepository, atMostOnce()).findPreguntasPorExamen(5L); //verifica que se ejecuta maximo 1 vez
+    }
+
+    @Test
+    void testNumeroDeInvocaciones2() {
+        when(repository.findAll()).thenReturn(Collections.emptyList());
+        service.findExamenPorNombreConPrguntas("Matematicas");
+
+        verify(preguntaRepository, never()).findPreguntasPorExamen(5L);
+        verifyNoInteractions(preguntaRepository);
+
+        verify(repository).findAll();
+        verify(repository, times(1)).findAll();
+        verify(repository, atLeast(1)).findAll();
+        verify(repository, atLeastOnce()).findAll();
+        verify(repository, atMost(10)).findAll();
+        verify(repository, atMostOnce()).findAll();
+    }
 }
