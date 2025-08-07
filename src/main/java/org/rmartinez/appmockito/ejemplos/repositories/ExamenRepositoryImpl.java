@@ -1,14 +1,15 @@
 package org.rmartinez.appmockito.ejemplos.repositories;
 
+import org.rmartinez.appmockito.ejemplos.Datos;
 import org.rmartinez.appmockito.ejemplos.models.Examen;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class ExamenRepositoryOtro implements ExamenRepository{
+public class ExamenRepositoryImpl implements ExamenRepository{
     @Override
     public Examen guardar(Examen examen) {
-        return null;
+        return Datos.EXAMEN;
     }
 
     @Override
@@ -19,6 +20,6 @@ public class ExamenRepositoryOtro implements ExamenRepository{
             e.printStackTrace();
         }
 
-        return null;
+        return Datos.EXAMENES;
     }
 }

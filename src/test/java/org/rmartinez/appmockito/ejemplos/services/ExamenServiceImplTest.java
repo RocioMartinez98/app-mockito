@@ -6,14 +6,15 @@ import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-import org.mockito.invocation.Invocation;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
+import org.rmartinez.appmockito.ejemplos.Datos;
 import org.rmartinez.appmockito.ejemplos.models.Examen;
 import org.rmartinez.appmockito.ejemplos.repositories.ExamenRepository;
-import org.rmartinez.appmockito.ejemplos.repositories.ExamenRepositoryOtro;
+import org.rmartinez.appmockito.ejemplos.repositories.ExamenRepositoryImpl;
 import org.rmartinez.appmockito.ejemplos.repositories.PreguntaRepository;
+import org.rmartinez.appmockito.ejemplos.repositories.PreguntaRepositoryImpl;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,9 +26,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class ExamenServiceImplTest {
     @Mock
-    ExamenRepository repository;
+    ExamenRepositoryImpl repository;
     @Mock
-    PreguntaRepository preguntaRepository;
+    PreguntaRepositoryImpl preguntaRepository;
     @InjectMocks
     ExamenServiceImpl service;
 
@@ -222,6 +223,41 @@ class ExamenServiceImplTest {
         assertEquals(5L, examen.getId());
         assertEquals("Matematicas", examen.getNombre());
 
+        verify(preguntaRepository).findPreguntasPorExamen(anyLong());
+    }
+
+    //doCallRealMethod
+    @Test
+    void testDoCallRealMethod() {
+        when(repository.findAll()).thenReturn(Datos.EXAMENES);
+        //when(preguntaRepository.findPreguntasPorExamen(anyLong())).thenReturn(Datos.PREGUNTAS);
+
+        doCallRealMethod().when(preguntaRepository).findPreguntasPorExamen(anyLong());
+        Examen examen = service.findExamenPorNombreConPrguntas("Matematicas");
+        assertEquals(5L, examen.getId());
+        assertEquals("Matematicas", examen.getNombre());
+    }
+
+    //Spy y doReturn
+    @Test
+    void testSpy() {
+        ExamenRepository examenRepository = spy(ExamenRepositoryImpl.class);
+        PreguntaRepository preguntaRepository = spy(PreguntaRepositoryImpl.class);
+        ExamenService examenService = new ExamenServiceImpl(examenRepository, preguntaRepository);
+
+        List<String> preguntas = Arrays.asList("aritmética");
+        //when(preguntaRepository.findPreguntasPorExamen(anyLong())).thenReturn(preguntas);
+        //when(preguntaRepository.findPreguntasPorExamen(anyLong())).thenReturn(Datos.PREGUNTAS);
+        doReturn(preguntas).when(preguntaRepository).findPreguntasPorExamen(anyLong());
+
+
+        Examen examen = examenService.findExamenPorNombreConPrguntas("Matematicas");
+        assertEquals(5, examen.getId());
+        assertEquals("Matematicas", examen.getNombre());
+        assertEquals(1, examen.getPreguntas().size());
+        assertTrue(examen.getPreguntas().contains("aritmética"));
+
+        verify(examenRepository).findAll();
         verify(preguntaRepository).findPreguntasPorExamen(anyLong());
     }
 }

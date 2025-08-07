@@ -1,4 +1,4 @@
-package org.rmartinez.appmockito.ejemplos.services;
+package org.rmartinez.appmockito.ejemplos;
 
 import org.rmartinez.appmockito.ejemplos.models.Examen;
 
